@@ -1,0 +1,927 @@
+import 'dart:async';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_beep/flutter_beep.dart';
+import 'package:sorting_visualizer/app/locator.dart';
+import 'package:sorting_visualizer/app/router.router.dart';
+import 'package:sorting_visualizer/datamodels/algo_history_track.dart';
+import 'package:sorting_visualizer/datamodels/algorithmType.dart';
+import 'package:sorting_visualizer/datamodels/barType.dart';
+import 'package:sorting_visualizer/datamodels/dialogType.dart';
+import 'package:sorting_visualizer/services/shared_preference_service.dart';
+import 'package:sorting_visualizer/utils/contents.dart';
+import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
+
+class VisualizerViewModel extends FutureViewModel<StreamController<List<int>>> {
+  final _snackBarService = locator<SnackbarService>();
+  final _dialogService = locator<DialogService>();
+  final _navigationService = locator<NavigationService>();
+  final _sharedPrefService = locator<SharedPreferenceService>();
+  final dataContent = DataContent();
+
+  AlgorithmType _algorithmType;
+
+  VisualizerViewModel(this._algorithmType, Size size) {
+    double x = size.height * 0.22; // bottomSheetHeight
+    double y = 100; //header height
+    _maxNumber = (size.height - x - y).toInt();
+    if (_maxNumber > 500) {
+      _maxNumber = 500;
+    }
+  }
+
+  List<int> _numbers = [];
+
+  List<AlgoHistoryTrack> _algoHistoryTrackList = [];
+  List<List<int>> _currentAlgoSortRecords = [];
+
+  GlobalKey<ScaffoldState> _globalDrawerKey = GlobalKey();
+
+  int _chkValueIdx = -1;
+
+  int get checkingValueIdx => _chkValueIdx;
+
+  int _sampleSize = 50;
+
+  int get sampleSize => _sampleSize;
+
+  late int _maxNumber;
+
+  int get maxNumber => _maxNumber;
+
+  double _sortingSpeed = 150;
+
+  double get sortingSpeed => _sortingSpeed;
+
+  int _sortDuration = 0;
+
+  int get sortDuration => _sortDuration;
+
+  int _totalComparisons = 0;
+
+  int get totalComparisons => _totalComparisons;
+
+  double _sliderValue = 0.0;
+
+  double get sliderValue => _sliderValue;
+
+  bool isLoading = true;
+  bool isSorting = false;
+  bool isContentExpanded = false;
+  bool isFirstTime = true;
+  bool isSoundEnable = true;
+  bool isShowHistoryEnable = true;
+  bool flagMode = false;
+  bool hideChakra = true;
+  BarType barType = BarType.DEFAULT_BAR;
+
+  late StreamController<List<int>> _streamController;
+
+  @override
+  Future<StreamController<List<int>>> futureToRun() async {
+    isLoading = true;
+    return new StreamController();
+  }
+
+  @override
+  void onData(StreamController<List<int>>? data) async {
+    super.onData(data);
+    if (data == null) return;
+    _streamController = data;
+
+    // Initializing last saved settings
+    _sampleSize = _sharedPrefService.sortingArraySize;
+    _sliderValue = _sharedPrefService.sortingSliderValue;
+    isShowHistoryEnable = _sharedPrefService.showSortingHistory;
+    isSoundEnable = _sharedPrefService.sortingSoundEnabled;
+    barType = _sharedPrefService.barType;
+    flagMode = _sharedPrefService.flagMode;
+    updateSpeed(_sliderValue);
+
+    reset();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _streamController.close();
+    super.dispose();
+  }
+
+  StreamController<List<int>> getStreamController() {
+    return _streamController;
+  }
+
+  reset({List<int>? customNumbers}) {
+    if (isSorting) {
+      _snackBarService.showSnackbar(
+          message: "Sorting in Progress...",
+          duration: Duration(milliseconds: 800));
+      return;
+    }
+    _numbers = [];
+    hideChakra = true;
+
+    if (customNumbers != null && customNumbers.isNotEmpty) {
+      customNumbers.forEach((num) {
+        _numbers.add(num);
+      });
+    } else {
+      int incrementer = 50;
+      for (int i = 0; i < _sampleSize; ++i) {
+        int rndNum = Random().nextInt(_maxNumber.toInt());
+        if (rndNum < 10) rndNum += 50; // Just for UI Purpose
+        if (_sampleSize <= 50)
+          incrementer += 5;
+        else if (_sampleSize <= 100)
+          incrementer += 2;
+        else if (_sampleSize <= 200) incrementer++;
+        _numbers.add(flagMode
+            ? i
+            : barType == BarType.SEQUENCE_BAR
+                ? (i + incrementer)
+                : rndNum);
+      }
+      if (flagMode || barType == BarType.SEQUENCE_BAR) _numbers.shuffle();
+    }
+
+    _streamController.add(_numbers);
+    _sortDuration = 0;
+    _totalComparisons = 0;
+    _currentAlgoSortRecords = [];
+    notifyListeners();
+  }
+
+  onActionBtn() async {
+    isFirstTime = false;
+    if (isArraySorted()) {
+      _snackBarService.showSnackbar(message: "Array already sorted!");
+      return;
+    }
+    if (isSorting) {
+      isSorting = false;
+      hideChakra = true;
+      notifyListeners();
+    } else {
+      Stopwatch _stopWatch = new Stopwatch()..start();
+      isSorting = true;
+      notifyListeners();
+
+      switch (_algorithmType) {
+        case AlgorithmType.BUBBLE_SORT:
+          await _bubbleSort();
+          break;
+        case AlgorithmType.INSERTION_SORT:
+          await _insertionSort();
+          break;
+        case AlgorithmType.SELECTION_SORT:
+          await _selectionSort();
+          break;
+        case AlgorithmType.MERGE_SORT:
+          await _mergeSort(0, _sampleSize - 1);
+          break;
+        case AlgorithmType.QUICK_SORT:
+          await _quickSort(0, _sampleSize.toInt() - 1);
+          break;
+        case AlgorithmType.CYCLE_SORT:
+          await _cycleSort();
+          break;
+        case AlgorithmType.RADIX_SORT:
+          await _radixSort();
+          break;
+        case AlgorithmType.COCKTAIL_SORT:
+          await _cocktailSort();
+          break;
+        case AlgorithmType.ODD_EVEN_SORT:
+          await _oddEvenSort();
+          break;
+        case AlgorithmType.HEAP_SORT:
+          await _heapSort();
+          break;
+        case AlgorithmType.SHELL_SORT:
+          await _shellSort();
+          break;
+        case AlgorithmType.BEAD_SORT:
+          await _beadSort();
+          break;
+        case AlgorithmType.GNOME_SORT:
+          await _gnomeSort();
+          break;
+      }
+
+      _stopWatch.stop();
+      isSorting = false;
+      bool isSorted = isArraySorted();
+      hideChakra = !isSorted;
+      _sortDuration = _stopWatch.elapsed.inMilliseconds;
+      _chkValueIdx = -1;
+
+      _algoHistoryTrackList.add(AlgoHistoryTrack(
+          dataContent.getAlgorithmTitle(_algorithmType),
+          _sampleSize,
+          _sortDuration,
+          _totalComparisons,
+          _currentAlgoSortRecords));
+
+      notifyListeners();
+
+      if (isSorted) goThroughAll();
+
+    }
+  }
+
+  goThroughAll() async {
+    for (int i = 0; i <= _numbers.length; i++) {
+      _chkValueIdx = i;
+      _playSound();
+      await Future.delayed(Duration(milliseconds: 10), () {});
+      _streamController.add(_numbers);
+    }
+    _chkValueIdx = -1;
+  }
+
+  // callable from inside function
+  onSortInBTCall({bool tCTU = true, int chkIdx = 0}) async {
+    if (tCTU) {
+      _incrementTotalComparisons();
+    }
+    _chkValueIdx = chkIdx;
+    await Future.delayed(_getDuration(), () {});
+    _streamController.add(_numbers);
+  }
+
+  // increment totalComparisons
+  _incrementTotalComparisons() {
+    _totalComparisons++;
+    _playSound();
+  }
+
+  _playSound() {
+    if (isSoundEnable) FlutterBeep.beep();
+  }
+
+  // Saving sortingStep
+  saveCurrentSortingStep() {
+    List<int> tempList = [];
+    _numbers.forEach((num) {
+      tempList.add(num);
+    });
+    _currentAlgoSortRecords.add(tempList);
+  }
+
+  updateSpeed(double value) {
+    // 200ms, 180ms, 160ms, 140ms, 120ms, 100ms, 80ms, 60ms, 40ms, 20ms, 0ms
+    _sliderValue = value;
+    _sharedPrefService.sortingSliderValue = _sliderValue;
+    _sortingSpeed = 500 - _sliderValue * 500;
+    if (_sortingSpeed == 0) _sortingSpeed = 1;
+    // print('VAL => $value | Speed => $sortingSpeed');
+    notifyListeners();
+  }
+
+  Duration _getDuration() {
+    return Duration(
+        milliseconds: _sortingSpeed.toInt()); //speeds[_currentDrnIdx];
+  }
+
+  getGlobalKey() {
+    return _globalDrawerKey;
+  }
+
+  List<int> getNumbers() {
+    return _numbers;
+  }
+
+  List<AlgoHistoryTrack> getSortingHistoryList() {
+    return _algoHistoryTrackList;
+  }
+
+  /// BUBBLE SORT IMPLEMENTATION
+  _bubbleSort() async {
+    mainFlow:
+    for (int i = 0; i < _numbers.length; ++i) {
+      bool swapped = false;
+      for (int j = 0; j < _numbers.length - i - 1; ++j) {
+        saveCurrentSortingStep();
+        if (_numbers[j] > _numbers[j + 1]) {
+          int temp = _numbers[j];
+          _numbers[j] = _numbers[j + 1];
+          _numbers[j + 1] = temp;
+          swapped = true;
+        }
+
+        if (!isSorting) break mainFlow;
+        await onSortInBTCall(chkIdx: j);
+      }
+      if (!swapped) break;
+    }
+  }
+
+  /// MERGE SORT IMPLEMENTATION
+  _mergeSort(int leftIndex, int rightIndex) async {
+    Future<void> merge(int leftIndex, int middleIndex, int rightIndex) async {
+      int leftSize = middleIndex - leftIndex + 1;
+      int rightSize = rightIndex - middleIndex;
+
+      List leftList = new List.filled(leftSize, null, growable: false);
+      List rightList = new List.filled(rightSize, null, growable: false);
+
+      for (int i = 0; i < leftSize; i++) leftList[i] = _numbers[leftIndex + i];
+      for (int j = 0; j < rightSize; j++)
+        rightList[j] = _numbers[middleIndex + j + 1];
+
+      int i = 0, j = 0;
+      int k = leftIndex;
+
+      while (i < leftSize && j < rightSize) {
+        saveCurrentSortingStep();
+
+        if (leftList[i] <= rightList[j]) {
+          _numbers[k] = leftList[i];
+          i++;
+        } else {
+          _numbers[k] = rightList[j];
+          j++;
+        }
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: k);
+
+        k++;
+      }
+
+      while (i < leftSize) {
+        saveCurrentSortingStep();
+        _numbers[k] = leftList[i];
+        i++;
+        k++;
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: k);
+      }
+
+      while (j < rightSize) {
+        saveCurrentSortingStep();
+        _numbers[k] = rightList[j];
+        j++;
+        k++;
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: k);
+      }
+    }
+
+    if (leftIndex < rightIndex) {
+      int middleIndex = (rightIndex + leftIndex) ~/ 2;
+
+      await _mergeSort(leftIndex, middleIndex);
+      await _mergeSort(middleIndex + 1, rightIndex);
+
+      if (!isSorting) return;
+      await onSortInBTCall(chkIdx: middleIndex);
+
+      await merge(leftIndex, middleIndex, rightIndex);
+    }
+  }
+
+  /// QUICK SORT IMPLEMENTATION
+  _quickSort(int leftIndex, int rightIndex) async {
+    Future<int> _partition(int left, int right) async {
+      int p = (left + (right - left) / 2).toInt();
+
+      var temp = _numbers[p];
+      _numbers[p] = _numbers[right];
+      _numbers[right] = temp;
+
+      if (!isSorting) return -1;
+      await onSortInBTCall(chkIdx: p, tCTU: false);
+      saveCurrentSortingStep();
+
+      int cursor = left;
+      for (int i = left; i < right; i++) {
+        _incrementTotalComparisons();
+        if (compare(_numbers[i], _numbers[right]) <= 0) {
+          var temp = _numbers[i];
+          _numbers[i] = _numbers[cursor];
+          _numbers[cursor] = temp;
+          cursor++;
+
+          if (!isSorting) return -1;
+          await onSortInBTCall(chkIdx: i, tCTU: false);
+        }
+        saveCurrentSortingStep();
+      }
+
+      temp = _numbers[right];
+      _numbers[right] = _numbers[cursor];
+      _numbers[cursor] = temp;
+
+      if (!isSorting) return -1;
+      await onSortInBTCall(chkIdx: right, tCTU: false);
+      saveCurrentSortingStep();
+
+      return cursor;
+    }
+
+    if (leftIndex < rightIndex) {
+      _incrementTotalComparisons();
+      if (!isSorting) return;
+      int p = await _partition(leftIndex, rightIndex);
+      if (p == -1) return;
+      await _quickSort(leftIndex, p - 1);
+      await _quickSort(p + 1, rightIndex);
+    }
+  }
+
+  compare(int a, int b) {
+    if (a < b) {
+      return -1;
+    } else if (a > b) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  /// SELECTION SORT IMPLEMENTATION
+  _selectionSort() async {
+    mainFlow:
+    for (int i = 0; i < _numbers.length; i++) {
+      for (int j = i + 1; j < _numbers.length; j++) {
+        saveCurrentSortingStep();
+        if (_numbers[i] > _numbers[j]) {
+          int temp = _numbers[i];
+          _numbers[i] = _numbers[j];
+          _numbers[j] = temp;
+        }
+
+        if (!isSorting) break mainFlow;
+        await onSortInBTCall(chkIdx: j);
+      }
+    }
+  }
+
+  /// INSERTION SORT IMPLEMENTATION
+  _insertionSort() async {
+    mainFlow:
+    for (int i = 1; i < _numbers.length; i++) {
+      int temp = _numbers[i];
+      int j = i - 1;
+      while (j >= 0 && temp < _numbers[j]) {
+        saveCurrentSortingStep();
+        _numbers[j + 1] = _numbers[j];
+        j--;
+
+        if (!isSorting) break mainFlow;
+        await onSortInBTCall(chkIdx: j);
+      }
+      _numbers[j + 1] = temp;
+      saveCurrentSortingStep();
+    }
+  }
+
+
+
+  /// CYCLE SORT IMPLEMENTATION
+  _cycleSort() async {
+    int writes = 0;
+    mainFlow:
+    for (int cs = 0; cs < _numbers.length - 1; cs++) {
+      int item = _numbers[cs];
+      int pos = cs;
+
+      for (int i = cs + 1; i < _numbers.length; i++) {
+        if (_numbers[i] < item) pos++;
+
+        if (!isSorting) break mainFlow;
+        _incrementTotalComparisons();
+      }
+
+      if (pos == cs) continue;
+
+      while (item == _numbers[pos]) {
+        _incrementTotalComparisons();
+        pos += 1;
+      }
+
+      if (pos != cs) {
+        _incrementTotalComparisons();
+        int temp = item;
+        item = _numbers[pos];
+        _numbers[pos] = temp;
+        writes++;
+        saveCurrentSortingStep();
+      }
+
+      while (pos != cs) {
+        pos = cs;
+        for (int i = cs + 1; i < _numbers.length; i++) {
+          if (_numbers[i] < item) pos++;
+
+          if (!isSorting) break mainFlow;
+          _incrementTotalComparisons();
+        }
+
+        while (item == _numbers[pos]) {
+          _incrementTotalComparisons();
+          pos++;
+        }
+
+        if (item != _numbers[pos]) {
+          _incrementTotalComparisons();
+          int temp = item;
+          item = _numbers[pos];
+          _numbers[pos] = temp;
+          writes++;
+          saveCurrentSortingStep();
+        }
+
+        if (!isSorting) break mainFlow;
+        await onSortInBTCall(chkIdx: pos, tCTU: false);
+      }
+    }
+  }
+
+  /// RADIX SORT IMPLEMENTATION
+  _radixSort() async {
+    Future<int> getMax() async {
+      int mx = _numbers[0];
+      for (int i = 0; i < _numbers.length; i++) {
+        mx = max(_numbers[i], mx);
+      }
+      return mx;
+    }
+
+    saveCurrentSortingStep();
+    Future<void> countingSort(int place) async {
+      int max = 10;
+      List<int> output = List.filled(_numbers.length, 0, growable: false);
+      List<int> count = List.filled(max, 0, growable: false);
+
+      for (int i = 0; i < max; i++) count[i] = 0;
+
+      for (int i = 0; i < _numbers.length; i++) {
+        count[_numbers[i] ~/ place % max]++;
+        if (!isSorting) return;
+        // await onSortInBTCall(chkIdx: i, tCTU: false);
+      }
+
+      for (int i = 1; i < max; i++) {
+        count[i] += count[i - 1];
+        if (!isSorting) return;
+        // await onSortInBTCall(chkIdx: i, tCTU: false);
+      }
+
+      for (int i = _numbers.length - 1; i >= 0; i--) {
+        output[count[_numbers[i] ~/ place % max] - 1] = _numbers[i];
+        count[_numbers[i] ~/ place % max]--;
+        if (!isSorting) return;
+        // await onSortInBTCall(chkIdx: i, tCTU: false);
+      }
+
+      for (int i = 0; i < _numbers.length; i++) {
+        _numbers[i] = output[i];
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: i, tCTU: false);
+        saveCurrentSortingStep();
+      }
+    }
+
+    int _max = await getMax();
+    for (int place = 1; _max ~/ place > 0; place *= 10) {
+      await countingSort(place);
+      // print(place);
+      if (!isSorting) return;
+      await onSortInBTCall(chkIdx: -1, tCTU: false);
+    }
+  }
+
+  /// COCKTAIL SORT IMPLEMENTATION
+  _cocktailSort() async {
+    bool isSwapped = true;
+    int start = 0;
+    int end = _numbers.length;
+
+    while (isSwapped) {
+      isSwapped = false;
+
+      for (int i = start; i < end - 1; i++) {
+        if (_numbers[i] > _numbers[i + 1]) {
+          int temp = _numbers[i];
+          _numbers[i] = _numbers[i + 1];
+          _numbers[i + 1] = temp;
+          isSwapped = true;
+        }
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: i);
+        saveCurrentSortingStep();
+      }
+
+      if (!isSwapped) break;
+
+      isSwapped = false;
+      end = end - 1;
+      for (int i = end - 1; i >= start; i--) {
+        if (_numbers[i] > _numbers[i + 1]) {
+          int temp = _numbers[i];
+          _numbers[i] = _numbers[i + 1];
+          _numbers[i + 1] = temp;
+          isSwapped = true;
+        }
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: i);
+        saveCurrentSortingStep();
+      }
+
+      start = start + 1;
+    }
+  }
+
+  /// ODD EVEN SORT IMPLEMENTATION
+  _oddEvenSort() async {
+    bool isSorted = false;
+
+    while (!isSorted) {
+      isSorted = true;
+
+      for (int i = 1; i <= _numbers.length - 2; i += 2) {
+        if (_numbers[i] > _numbers[i + 1]) {
+          int temp = _numbers[i];
+          _numbers[i] = _numbers[i + 1];
+          _numbers[i + 1] = temp;
+          isSorted = false;
+        }
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: i);
+        saveCurrentSortingStep();
+      }
+
+      for (int i = 0; i <= _numbers.length - 2; i += 2) {
+        if (_numbers[i] > _numbers[i + 1]) {
+          int temp = _numbers[i];
+          _numbers[i] = _numbers[i + 1];
+          _numbers[i + 1] = temp;
+          isSorted = false;
+        }
+
+        if (!isSorting) return;
+        await onSortInBTCall(chkIdx: i);
+        saveCurrentSortingStep();
+      }
+    }
+  }
+
+  /// HEAP SORT IMPLEMENTATION
+  _heapSort() async {
+    for (int i = _numbers.length ~/ 2; i >= 0; i--) {
+      if (!isSorting) return;
+      await heapify(_numbers, _numbers.length, i);
+    }
+    for (int i = _numbers.length - 1; i >= 0; i--) {
+      int temp = _numbers[0];
+      _numbers[0] = _numbers[i];
+      _numbers[i] = temp;
+      if (!isSorting) return;
+      await heapify(_numbers, i, 0);
+    }
+  }
+
+  heapify(List<int> arr, int n, int i) async {
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && arr[l] > arr[largest]) largest = l;
+    _incrementTotalComparisons();
+    if (r < n && arr[r] > arr[largest]) largest = r;
+    _incrementTotalComparisons();
+
+    if (largest != i) {
+      int temp = _numbers[i];
+      _numbers[i] = _numbers[largest];
+      _numbers[largest] = temp;
+      heapify(arr, n, largest);
+    }
+
+    await onSortInBTCall(chkIdx: i);
+    saveCurrentSortingStep();
+  }
+
+  /// SHELL SORT IMPLEMENTATION
+  _shellSort() async {
+    mainFlow:
+    for (int gap = _numbers.length ~/ 2; gap > 0; gap ~/= 2) {
+      for (int i = gap; i < _numbers.length; i++) {
+        int temp = _numbers[i];
+        int j;
+        for (j = i; j >= gap && _numbers[j - gap] > temp; j -= gap) {
+          _numbers[j] = _numbers[j - gap];
+          _incrementTotalComparisons();
+          saveCurrentSortingStep();
+        }
+
+        _numbers[j] = temp;
+        saveCurrentSortingStep();
+        if (!isSorting) break mainFlow;
+        await onSortInBTCall(chkIdx: j, tCTU: false);
+      }
+    }
+  }
+
+  /// BEAD SORT IMPLEMENTATION
+  _beadSort() async {
+    int _max = _numbers[0];
+    for (int i = 0; i < _numbers.length; i++) {
+      _max = max(_numbers[i], _max);
+    }
+
+    // setting the abacus
+    List grid = List.generate(
+        _numbers.length, (index) => new List.filled(_max, BeadStatus.NULL),
+        growable: false);
+
+    List<int> levelCount = [];
+    for (int i = 0; i < _max; i++) {
+      levelCount.add(0);
+      for (int j = 0; j < _numbers.length; j++) {
+        grid[j][i] = BeadStatus.NOT_MARKED;
+      }
+    }
+
+    for (int i = 0; i < _numbers.length; i++) {
+      var num = _numbers[i];
+      for (int j = 0; num > 0; j++, num--) {
+        grid[levelCount[j]++][j] = BeadStatus.MARKED;
+      }
+    }
+
+    for (int i = 0; i < _numbers.length; i++) {
+      int putt = 0;
+      for (int j = 0;
+          j < _max && grid[_numbers.length - 1 - i][j] == BeadStatus.MARKED;
+          j++) {
+        putt++;
+        _incrementTotalComparisons();
+      }
+      _numbers[i] = putt;
+      saveCurrentSortingStep();
+      if (!isSorting) return;
+      await onSortInBTCall(chkIdx: i, tCTU: false);
+    }
+  }
+
+  /// GNOME SORT IMPLEMENTATION
+  _gnomeSort() async {
+    int index = 0;
+    while (index < _numbers.length) {
+      if (index == 0) index++;
+      if (_numbers[index] >= _numbers[index - 1])
+        index++;
+      else {
+        int temp = _numbers[index];
+        _numbers[index] = _numbers[index - 1];
+        _numbers[index - 1] = temp;
+
+        index--;
+      }
+      saveCurrentSortingStep();
+      if (!isSorting) return;
+      await onSortInBTCall(chkIdx: index);
+    }
+  }
+
+  bool isArraySorted() {
+    for (int i = 1; i < _numbers.length; i++) {
+      if (_numbers[i - 1] > _numbers[i]) return false;
+    }
+    return true;
+  }
+
+  String getTitle() {
+    return dataContent.getAlgorithmTitle(_algorithmType);
+  }
+
+  String getAlgorithmDesc() {
+    return dataContent.getDescription(_algorithmType);
+  }
+
+  String getTC(int idx) {
+    return dataContent.getTimeComplexities(_algorithmType)[idx];
+  }
+
+  String getSC() {
+    return dataContent.getSpaceComplexity(_algorithmType);
+  }
+
+  String getExtraInfo() {
+    return dataContent.algoExtraInfo(_algorithmType);
+  }
+
+  String getAlgorithmCode() {
+    return dataContent.getAlgorithmCode(_algorithmType);
+  }
+
+  onCustomBtnClick() async {
+    if (isSorting) {
+      _snackBarService.showSnackbar(
+          message: "Sorting in progress...",
+          duration: Duration(milliseconds: 700));
+      return;
+    }
+
+    var dialogResponse = await _dialogService.showCustomDialog(
+        variant: DialogType.CUSTOM_INPUT,
+        title: "Provide elements of the Array",
+        description:
+            "Example: ${Random().nextInt(100)}, ${Random().nextInt(100)}, ${Random().nextInt(100)}, ${Random().nextInt(100)} (Max - ${(_maxNumber ~/ 10) * 10})",
+        mainButtonTitle: "Submit",
+        secondaryButtonTitle: "Cancel",
+        data: (_maxNumber ~/ 10) * 10,
+        barrierDismissible: false);
+
+    if (dialogResponse != null &&
+        dialogResponse.confirmed &&
+        dialogResponse.data != null) {
+      List<int> responseArray = dialogResponse.data.toList();
+
+      if (responseArray.isNotEmpty) {
+        _sampleSize = responseArray.length;
+        reset(customNumbers: responseArray);
+        notifyListeners();
+      }
+    }
+  }
+
+  onBackBtnPressed() {
+    _navigationService.back();
+  }
+
+  List<String> getAlgorithmsList() {
+    return dataContent.getAlgorithms();
+  }
+
+  onMenuItemClick(String value) {
+    if (isSorting) {
+      // _snackBarService.showSnackbar(message: "To change Algorithm Stop Sorting");
+    } else {
+      _algorithmType = dataContent.getAlgorithmType(value);
+      _sharedPrefService.algorithmSelected = _algorithmType.toString();
+    }
+    notifyListeners();
+  }
+
+  openMenuDrawer() {
+    _globalDrawerKey.currentState?.openEndDrawer();
+  }
+
+  changeArraySize() async {
+    if (isSorting) {
+      _snackBarService.showSnackbar(
+          message: "Sorting in progress...",
+          duration: Duration(milliseconds: 700));
+      return;
+    }
+    var dialogResponse = await _dialogService.showCustomDialog(
+        variant: DialogType.CUSTOM_ARRAY_SIZE,
+        title: "Provide size of the Array",
+        description: "1 < Input < 1000",
+        mainButtonTitle: "Submit",
+        secondaryButtonTitle: "Cancel",
+        barrierDismissible: false);
+
+    if (dialogResponse != null &&
+        dialogResponse.confirmed &&
+        dialogResponse.data.toString().isNotEmpty) {
+      _sampleSize = int.parse(dialogResponse.data.toString());
+      _sharedPrefService.sortingArraySize = _sampleSize;
+      reset();
+    }
+  }
+
+  moveToDetailedSortHistory() {
+    _navigationService.navigateTo(Routes.sortingDetailedView,
+        arguments:
+            SortingDetailedViewArguments(algoTracks: _algoHistoryTrackList));
+  }
+
+  moveToSettings() async {
+    await _navigationService.navigateTo(Routes.settingsView);
+    // update the settings
+    this.isShowHistoryEnable = _sharedPrefService.showSortingHistory;
+    this.isSoundEnable = _sharedPrefService.sortingSoundEnabled;
+    this.barType = _sharedPrefService.barType;
+
+    if (this.flagMode != _sharedPrefService.flagMode) {
+      this.flagMode = _sharedPrefService.flagMode;
+      reset();
+    }
+    notifyListeners();
+  }
+}
+
+enum BeadStatus { MARKED, NOT_MARKED, NULL }
