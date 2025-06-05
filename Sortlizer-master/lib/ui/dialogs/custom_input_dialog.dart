@@ -92,12 +92,12 @@ class _CustomInputDialogState extends State<CustomInputDialog> {
               Text(
                 widget.dialogRequest.title!,
                 style:
-                    theme.textTheme.subtitle2?.copyWith(color: lightGrayColor),
+                    theme.textTheme.titleSmall?.copyWith(color: lightGrayColor),
               ),
               SizedBox(height: 10),
               Text(
                 widget.dialogRequest.description!,
-                style: theme.textTheme.caption
+                style: theme.textTheme.bodySmall
                     ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial'),
               ),
               SizedBox(height: 10),
@@ -116,13 +116,13 @@ class _CustomInputDialogState extends State<CustomInputDialog> {
               if (resultsList.isNotEmpty)
                 Text(
                   '(Tap to remove)',
-                  style: theme.textTheme.overline
+                  style: theme.textTheme.labelSmall
                       ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial'),
                 ),
               SizedBox(height: 10),
               if (showError)
                 Text(errorMessage,
-                    style: theme.textTheme.caption
+                    style: theme.textTheme.bodySmall
                         ?.copyWith(color: Colors.redAccent)),
               if (showError) SizedBox(height: 5),
               Container(
@@ -139,11 +139,11 @@ class _CustomInputDialogState extends State<CustomInputDialog> {
                           maxLines: 1,
                           keyboardType: TextInputType.number,
                           controller: _controller,
-                          style: theme.textTheme.subtitle2
+                          style: theme.textTheme.titleSmall
                               ?.copyWith(color: lightGrayColor),
                           decoration: InputDecoration(
                               hintText: 'Eg., $egNum',
-                              hintStyle: theme.textTheme.caption
+                              hintStyle: theme.textTheme.bodySmall
                                   ?.copyWith(color: Color(0xff9B9B9B)),
                               focusedBorder: InputBorder.none,
                               border: InputBorder.none,
@@ -219,7 +219,7 @@ class NumberBox extends StatelessWidget {
             number.toString(),
             style: Theme.of(context)
                 .textTheme
-                .overline
+                .labelSmall
                 ?.copyWith(color: Colors.white, fontFamily: 'Arial'),
           ))),
     );

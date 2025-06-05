@@ -40,7 +40,7 @@ class SettingsView extends StatelessWidget {
                             Spacer(),
                             Text(
                               "Settings",
-                              style: theme.textTheme.subtitle2
+                              style: theme.textTheme.titleSmall
                                   ?.copyWith(color: Colors.white, fontSize: 15),
                             ),
                             SizedBox(width: 30),
@@ -57,7 +57,7 @@ class SettingsView extends StatelessWidget {
                                 const EdgeInsets.only(left: 15.0),
                             child: Text(
                               "General",
-                              style: theme.textTheme.caption?.copyWith(
+                              style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green),
                             ),
@@ -72,7 +72,7 @@ class SettingsView extends StatelessWidget {
                                   'Show Sorting History',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle2
+                                      .titleSmall
                                       ?.copyWith(color: Colors.white),
                                 ),
                               ),
@@ -101,7 +101,7 @@ class SettingsView extends StatelessWidget {
                             const EdgeInsets.only(left: 15.0),
                             child: Text(
                               "App",
-                              style: theme.textTheme.caption?.copyWith(
+                              style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green),
                             ),
@@ -138,10 +138,10 @@ class ActionItem extends StatelessWidget {
     var theme = Theme.of(context);
     return ListTile(
       title: Text(title,
-          style: theme.textTheme.subtitle2?.copyWith(color: Colors.white)),
+          style: theme.textTheme.titleSmall?.copyWith(color: Colors.white)),
       subtitle: Text(
         subtitle,
-        style: theme.textTheme.caption
+        style: theme.textTheme.bodySmall
             ?.copyWith(color: theme.colorScheme.secondary),
       ),
       onTap: onTap,

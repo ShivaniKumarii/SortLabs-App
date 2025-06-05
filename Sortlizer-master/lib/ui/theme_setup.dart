@@ -10,7 +10,7 @@ List<ThemeData> getThemes() {
         disabledColor: Color(0x4D5E5C5C),
         fontFamily: 'Montserrat',
         textTheme: TextTheme(
-          overline: TextStyle(fontFamily: 'Montserrat', letterSpacing: 0),
+          labelSmall: TextStyle(fontFamily: 'Montserrat', letterSpacing: 0),
         ),
         canvasColor: darkBackgroundFinish,
         appBarTheme: AppBarTheme(backgroundColor: blueThemeColor),
@@ -54,8 +54,7 @@ List<ThemeData> getThemes() {
           color: Colors.white,
         )),
     ThemeData(
-        backgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSwatch()
-            .copyWith(primary: orangeThemeColor, secondary: Colors.green))
+            .copyWith(primary: orangeThemeColor, secondary: Colors.green).copyWith(background: Colors.white))
   ];
 }

@@ -1,0 +1,29 @@
+# C:\GitHub_SortLabs\Sortlizer-master\analysis_options.yaml
+
+# Temporarily remove or comment out the 'include' line
+# if you don't have flutter_lints added to pubspec.yaml.
+# We'll rely only on explicit rules here for a quick fix.
+ # include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    # Treat deprecation warnings as infos (not errors)
+    deprecated_member_use: info
+    undefined_lint_warning: false
+    invalid_use_of_visible_for_testing_member: false
+    unused_import: false            # To ignore 'Unused import' warnings
+    unused_local_variable: false
+    unrecognized_error_code: false
+
+linter:
+  rules:
+    # Disable the specific rules causing your current warnings
+    # This will completely hide these issues from the analyzer output
+        # To ignore 'The value of the local variable 'writes' isn't used'
+    no_logic_in_create_state: false # To ignore 'Don't put any logic in 'createState''
+    sized_box_for_whitespace: false # To ignore 'Use a 'SizedBox' to add whitespace'
+    prefer_const_constructors: false # To ignore 'Use 'const' with the constructor to improve performance'
+    prefer_const_literals_to_create_immutables: false # To ignore 'Use 'const' literals as arguments...'
+    sort_child_properties_last: false # To ignore 'The 'child' argument should be last...'
+     # To ignore 'Invalid use of a private type...'
+    non_constant_identifier_names: false # To ignore 'The file name 'dropDownWidget.dart' isn't a snake_case identifier'

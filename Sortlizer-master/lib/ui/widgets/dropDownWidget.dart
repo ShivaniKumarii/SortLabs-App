@@ -47,7 +47,7 @@ class _DropDownWidgetState extends State<DropDownWidget> {
             value: value,
             child: Container(
               child: Text(value,
-                  style: theme.textTheme.subtitle2?.copyWith(
+                  style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: value == _selectedType
                           ? FontWeight.bold
                           : FontWeight.normal,

@@ -31,7 +31,7 @@ class AboutAppDialog extends StatelessWidget {
             Row(
               children: [
                 Text(dialogRequest.title!,
-                    style: theme.textTheme.subtitle1
+                    style: theme.textTheme.titleMedium
                         ?.copyWith(color: Colors.white)),
                 Spacer(),
                 Container(
@@ -54,19 +54,19 @@ class AboutAppDialog extends StatelessWidget {
             RichText(
                 text: TextSpan(
                     text: "Hi, This is  ",
-                    style: theme.textTheme.subtitle2
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(color: Colors.white70),
                     children: [
                   TextSpan(
                     text: "$developerName 👋",
-                    style: theme.textTheme.subtitle2
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(color: Colors.green),
                   )
                 ])),
             SizedBox(height: 20),
             Text(dialogRequest.description!,
                 style:
-                    theme.textTheme.subtitle2?.copyWith(color: Colors.white70)),
+                    theme.textTheme.titleSmall?.copyWith(color: Colors.white70)),
             SizedBox(height: 0),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -90,7 +90,7 @@ class AboutAppDialog extends StatelessWidget {
             SizedBox(height: 10),
             Text("Connect :",
                 style:
-                    theme.textTheme.subtitle2?.copyWith(color: Colors.white70)),
+                    theme.textTheme.titleSmall?.copyWith(color: Colors.white70)),
             SizedBox(height: 10),
             Wrap(
               spacing: 10,
@@ -103,7 +103,7 @@ class AboutAppDialog extends StatelessWidget {
                     height: 20,
                     child: Center(
                         child: Text('in',
-                            style: theme.textTheme.subtitle2
+                            style: theme.textTheme.titleSmall
                                 ?.copyWith(color: Colors.white))),
                     decoration: BoxDecoration(
                         color: Color(0xff0A66C2),
@@ -156,7 +156,7 @@ class SocialHandleWidget extends StatelessWidget {
         Text(handleName,
             style: Theme.of(context)
                 .textTheme
-                .caption
+                .bodySmall
                 ?.copyWith(color: Colors.white, letterSpacing: 0.5))
       ]),
     );

@@ -18,9 +18,9 @@ class SortingHistoryTable extends StatelessWidget {
   Widget build(BuildContext context) {
     var headerStyle = Theme.of(context)
         .textTheme
-        .caption
+        .bodySmall
         ?.copyWith(fontWeight: FontWeight.bold, color: Colors.white);
-    var normalStyle = Theme.of(context).textTheme.caption?.copyWith(
+    var normalStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
         fontWeight: FontWeight.bold,
         color: lightGrayColor,
         fontFamily: 'Arial');
@@ -35,7 +35,7 @@ class SortingHistoryTable extends StatelessWidget {
                 tableName,
                 style: Theme.of(context)
                     .textTheme
-                    .subtitle2
+                    .titleSmall
                     ?.copyWith(color: Colors.green.shade300),
               ),
               TextButton(
@@ -47,7 +47,7 @@ class SortingHistoryTable extends StatelessWidget {
                       "View Detailed Track",
                       style: Theme.of(context)
                           .textTheme
-                          .caption
+                          .bodySmall
                           ?.copyWith(color: lightGrayColor),
                     ),
                     Icon(

@@ -33,7 +33,7 @@ class _BodyView extends ViewModelWidget<SortingDetailedViewModel> {
   Widget _getItemInfo(String title, int value, BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title,
-          style: Theme.of(context).textTheme.caption?.copyWith(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: lightGrayColor,
               fontFamily: 'Arial',
               fontWeight: FontWeight.bold)),
@@ -41,7 +41,7 @@ class _BodyView extends ViewModelWidget<SortingDetailedViewModel> {
       Text(value.toString(),
           style: Theme.of(context)
               .textTheme
-              .overline
+              .labelSmall
               ?.copyWith(color: lightGrayColor, fontFamily: 'Arial')),
     ]);
   }
@@ -65,7 +65,7 @@ class _BodyView extends ViewModelWidget<SortingDetailedViewModel> {
               children: [
                 Text(
                   item.algoTrack.algoTitle,
-                  style: theme.textTheme.subtitle1?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                       color: Colors.white,
                       fontFamily: 'Arial',
                       fontWeight: FontWeight.bold),
@@ -91,7 +91,7 @@ class _BodyView extends ViewModelWidget<SortingDetailedViewModel> {
                     child: TextButton(
                       onPressed: () => model.onSeeTrackBtnTap(item),
                       child: Text(item.isExpanded ? 'Hide' : 'See Track',
-                          style: theme.textTheme.caption
+                          style: theme.textTheme.bodySmall
                               ?.copyWith(color: Colors.white)),
                     ),
                   )
@@ -163,7 +163,7 @@ class _StepByStepHistoryList extends ViewModelWidget<SortingDetailedViewModel> {
                 'Array Size is too large to visualize. Use array size of 200 or less.',
                 style: Theme.of(context)
                     .textTheme
-                    .subtitle2
+                    .titleSmall
                     ?.copyWith(color: orangeThemeColor),
               )
             : trackItem.algoTrack.sortTrack.isNotEmpty
@@ -207,7 +207,7 @@ class _StepByStepHistoryList extends ViewModelWidget<SortingDetailedViewModel> {
                 : Text('Nothing Found',
                     style: Theme.of(context)
                         .textTheme
-                        .caption
+                        .bodySmall
                         ?.copyWith(color: Colors.white)));
   }
 }

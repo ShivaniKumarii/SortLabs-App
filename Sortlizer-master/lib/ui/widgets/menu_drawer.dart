@@ -50,7 +50,7 @@ class MenuDrawer extends StatelessWidget {
                       },
                       child: Container(
                         child: Text(value,
-                            style: theme.textTheme.subtitle2?.copyWith(
+                            style: theme.textTheme.titleSmall?.copyWith(
                                 color: selectedValue == value
                                     ? Colors.white
                                     : lightGrayColor,
@@ -76,7 +76,7 @@ class MenuDrawer extends StatelessWidget {
                       'Settings',
                       style: Theme.of(context)
                           .textTheme
-                          .subtitle2
+                          .titleSmall
                           ?.copyWith(color: Colors.white),
                     ),
                     Spacer(),

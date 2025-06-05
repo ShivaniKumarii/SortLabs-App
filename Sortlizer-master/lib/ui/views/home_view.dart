@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sorting_visualizer/ui/ui_theme.dart';
 import 'package:sorting_visualizer/ui/views/home_viewmodel.dart';
-import 'package:sorting_visualizer/ui/widgets/bars_loader.dart';
 import 'package:sorting_visualizer/ui/widgets/custom_round_btn.dart';
 import 'package:stacked/stacked.dart';
 
@@ -38,7 +37,7 @@ class HomeView extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text('Sorting',
-                                  style: theme.textTheme.headline5?.copyWith(
+                                  style: theme.textTheme.headlineSmall?.copyWith(
                                       color: Colors.green.shade300, letterSpacing: 1)),
                               SizedBox(
                                 height: 50,
@@ -82,14 +81,14 @@ class HomeView extends StatelessWidget {
                   Text(
                     'Tap to Get Started',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.subtitle2
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(color: Colors.white70),
                   ),
                   Spacer(),
                   Text(
                     "Visualize Algorithms to Reality",
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.subtitle2
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(color: lightGrayColor, letterSpacing: 0.5),
                   ),
                   SizedBox(
@@ -100,18 +99,17 @@ class HomeView extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: Color(0xFF56B870),
                         borderRadius: BorderRadius.circular(20.0)),
-                    child: TyperAnimatedTextKit(
-                      text: model.getAlgorithmsList(),
-                      textAlign: TextAlign.center,
-                      repeatForever: true,
-                      isRepeatingAnimation: true,
-                      textStyle: theme.textTheme.subtitle1
-                          ?.copyWith(color: Colors.white, letterSpacing: 1),
-                      speed: Duration(milliseconds: 50),
+                    child: AnimatedTextKit(
+                      animatedTexts: [ TyperAnimatedText(
+                        model.getAlgorithmsList(),
+                        textStyle: theme.textTheme.titleMedium?.copyWith(color: Colors.white, letterSpacing: 1), // Updated TextTheme
+                        speed: Duration(milliseconds: 50),
+                      ),
+              ],
                     ),
                   ),
                   // SizedBox(height: 20),
-                  // Text(model.getAppVersion(), style: theme.textTheme.overline?.copyWith(color: lightGrayColor)),
+                  // Text(model.getAppVersion(), style: theme.textTheme.labelSmall?.copyWith(color: lightGrayColor)),
                   // SizedBox(height: 20),
                 ],
               ),

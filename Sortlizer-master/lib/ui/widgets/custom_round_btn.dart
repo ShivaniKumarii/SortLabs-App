@@ -44,7 +44,7 @@ class _CustomRoundButtonState extends State<CustomRoundButton> {
             Text(widget.labelText!,
                 style: Theme.of(context)
                     .textTheme
-                    .overline
+                    .labelSmall
                     ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial')),
           if (widget.labelText != null && widget.labelText!.isNotEmpty)
             SizedBox(height: 15),

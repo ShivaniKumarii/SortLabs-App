@@ -48,7 +48,7 @@ class _CodeViewerState extends State<CodeViewer> {
               widget.titleLabel!,
               style: Theme.of(context)
                   .textTheme
-                  .subtitle2
+                  .titleSmall
                   ?.copyWith(color: Colors.green),
             ),
           ),
@@ -149,7 +149,7 @@ class _CodeViewerState extends State<CodeViewer> {
                 child: Text(
                   widget.sourceLabel!,
                   textAlign: TextAlign.end,
-                  style: Theme.of(context).textTheme.caption?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontStyle: FontStyle.italic, color: lightGrayColor),
                 ),
               ),

@@ -80,7 +80,7 @@ class _HeaderView extends ViewModelWidget<VisualizerViewModel> {
                 ),
                 Text(
                   model.getTitle(),
-                  style: theme.textTheme.subtitle2
+                  style: theme.textTheme.titleSmall
                       ?.copyWith(color: Colors.white, fontSize: 15),
                 ),
                 CustomRoundButton(
@@ -101,14 +101,14 @@ class _HeaderView extends ViewModelWidget<VisualizerViewModel> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(model.isSorting ? 'Sorting' : 'Sort Result',
-                    style: theme.textTheme.overline
+                    style: theme.textTheme.labelSmall
                         ?.copyWith(color: mediumGrayColor, letterSpacing: 0.5)),
                 SizedBox(height: 2),
                 model.isSorting
                     ? MyBarLoader()
                     : Text(
                         '${model.sortDuration} ms, ${model.totalComparisons} Comparisons',
-                        style: theme.textTheme.caption?.copyWith(
+                        style: theme.textTheme.bodySmall?.copyWith(
                             color: lightGrayColor, letterSpacing: 0.5),
                       )
                 // MyStopWatch(
@@ -164,7 +164,7 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                             '${i}x',
                             style: Theme.of(context)
                                 .textTheme
-                                .overline
+                                .labelSmall
                                 ?.copyWith(color: lightGrayColor),
                           ),
                       ]),
@@ -257,12 +257,12 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
           SizedBox(height: 20),
           Text(
             model.getTitle(),
-            style: theme.textTheme.subtitle1?.copyWith(color: Colors.green.shade300 , fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(color: Colors.green.shade300 , fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
           Text(
             model.getAlgorithmDesc(),
-            style: theme.textTheme.subtitle2
+            style: theme.textTheme.titleSmall
                 ?.copyWith(color: lightGrayColor, fontFamily: 'Arial'),
           ),
           SizedBox(height: 25),
@@ -274,7 +274,7 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                 children: [
                   Text(
                     "Time Complexity:",
-                    style: theme.textTheme.caption
+                    style: theme.textTheme.bodySmall
                         ?.copyWith(color: mediumGrayColor),
                   ),
                   SizedBox(height: 10),
@@ -282,13 +282,13 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                     children: [
                       Text(
                         "Worst Case:\t",
-                        style: theme.textTheme.subtitle2?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                             fontFamily: 'Arial',
                             fontWeight: FontWeight.normal,
                             color: Colors.white70),
                       ),
                       Text(model.getTC(0),
-                          style: theme.textTheme.subtitle2?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 1)),
@@ -298,13 +298,13 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                     children: [
                       Text(
                         "Average Case:\t",
-                        style: theme.textTheme.subtitle2?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                             fontFamily: 'Arial',
                             fontWeight: FontWeight.normal,
                             color: Colors.white70),
                       ),
                       Text(model.getTC(1),
-                          style: theme.textTheme.subtitle2?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 1)),
@@ -314,13 +314,13 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                     children: [
                       Text(
                         "Best Case:\t",
-                        style: theme.textTheme.subtitle2?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                             fontFamily: 'Arial',
                             fontWeight: FontWeight.normal,
                             color: Colors.white70),
                       ),
                       Text(model.getTC(2),
-                          style: theme.textTheme.subtitle2?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 1)),
@@ -334,7 +334,7 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                 children: [
                   Text(
                     "Space Complexity:",
-                    style: theme.textTheme.caption
+                    style: theme.textTheme.bodySmall
                         ?.copyWith(color: mediumGrayColor),
                   ),
                   SizedBox(height: 10),
@@ -342,13 +342,13 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
                     children: [
                       Text(
                         "Worst Case:\t",
-                        style: theme.textTheme.subtitle2?.copyWith(
+                        style: theme.textTheme.titleSmall?.copyWith(
                             fontFamily: 'Arial',
                             fontWeight: FontWeight.normal,
                             color: Colors.white70),
                       ),
                       Text(model.getSC(),
-                          style: theme.textTheme.subtitle2?.copyWith(
+                          style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 1)),
@@ -364,7 +364,7 @@ class BuildBottomDraggableSheet extends ViewModelWidget<VisualizerViewModel> {
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Text(
                 model.getExtraInfo(),
-                style: theme.textTheme.subtitle2
+                style: theme.textTheme.titleSmall
                     ?.copyWith(color: lightGrayColor, fontFamily: 'Arial'),
               ),
             ),

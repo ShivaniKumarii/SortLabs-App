@@ -98,12 +98,12 @@ class _CustomArraySizeDialogState extends State<CustomArraySizeDialog> {
         children: [
           Text(
             widget.dialogRequest.title!,
-            style: theme.textTheme.subtitle2?.copyWith(color: lightGrayColor),
+            style: theme.textTheme.titleSmall?.copyWith(color: lightGrayColor),
           ),
           SizedBox(height: 10),
           Text(
             widget.dialogRequest.description!,
-            style: theme.textTheme.caption
+            style: theme.textTheme.bodySmall
                 ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial'),
           ),
           SizedBox(height: 20),
@@ -121,11 +121,11 @@ class _CustomArraySizeDialogState extends State<CustomArraySizeDialog> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       controller: _controller,
-                      style: theme.textTheme.subtitle2
+                      style: theme.textTheme.titleSmall
                           ?.copyWith(color: lightGrayColor),
                       decoration: InputDecoration(
                           hintText: 'Ex: 100',
-                          hintStyle: theme.textTheme.caption
+                          hintStyle: theme.textTheme.bodySmall
                               ?.copyWith(color: Color(0xff9B9B9B)),
                           focusedBorder: InputBorder.none,
                           border: InputBorder.none,
@@ -138,7 +138,7 @@ class _CustomArraySizeDialogState extends State<CustomArraySizeDialog> {
               SizedBox(width: 10),
               Text(
                 "or",
-                style: theme.textTheme.caption
+                style: theme.textTheme.bodySmall
                     ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial'),
               ),
               SizedBox(width: 10),

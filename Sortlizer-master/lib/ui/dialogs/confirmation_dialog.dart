@@ -29,13 +29,13 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
         children: [
           Text(
             widget.dialogRequest.title!,
-            style: theme.textTheme.subtitle2?.copyWith(color: lightGrayColor),
+            style: theme.textTheme.titleSmall?.copyWith(color: lightGrayColor),
           ),
           SizedBox(height: 10),
           if (widget.dialogRequest.description != null)
             Text(
               widget.dialogRequest.description!,
-              style: theme.textTheme.caption
+              style: theme.textTheme.bodySmall
                   ?.copyWith(color: mediumGrayColor, fontFamily: 'Arial'),
             ),
           SizedBox(height: 20),

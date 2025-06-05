@@ -54,6 +54,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^1.0.4
 
   build_runner: ^2.1.5
   stacked_generator: ^0.5.6

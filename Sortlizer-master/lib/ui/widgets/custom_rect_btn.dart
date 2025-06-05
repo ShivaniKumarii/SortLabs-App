@@ -40,21 +40,20 @@ class CustomRectButton extends StatelessWidget {
                 (labelText != null && labelText!.isNotEmpty) ? labelText! : "",
                 style: Theme.of(context)
                     .textTheme
-                    .subtitle2
+                    .titleSmall
                     ?.copyWith(color: labelTextColor ?? Colors.white),
                 textAlign: TextAlign.center,
               )
             : child,
         style: ElevatedButton.styleFrom(
-            elevation: 10,
-            primary: btnColor ?? darkBtnColor2,
+            elevation: 10, backgroundColor: btnColor ?? darkBtnColor2,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5))),
             // onPrimary: Theme.of(context).primaryColor,
             side: BorderSide(
               color: btnBorderColor ?? Colors.transparent,
             ),
-            textStyle: Theme.of(context).textTheme.caption?.copyWith(
+            textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).primaryColor)),
       ),

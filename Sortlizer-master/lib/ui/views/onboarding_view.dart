@@ -5,7 +5,6 @@ import 'package:sorting_visualizer/app/locator.dart';
 import 'package:sorting_visualizer/app/router.router.dart';
 import 'package:sorting_visualizer/services/shared_preference_service.dart';
 
-import '../ui_theme.dart';
 
 class OnBoardingView extends StatefulWidget {
   @override
@@ -52,7 +51,7 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                             _pageIndex != 4 ? 'Skip' : 'Start',
                             style: Theme.of(context)
                                 .textTheme
-                                .subtitle2
+                                .titleSmall
                                 ?.copyWith(
                                     color: _pageIndex != 4
                                         ? Colors.grey.shade600
@@ -143,9 +142,9 @@ class _OnBoardingViewState extends State<OnBoardingView> {
       PageDecoration(
         titleTextStyle: Theme.of(context)
             .textTheme
-            .headline5!
+            .headlineSmall!
             .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
-        bodyTextStyle: Theme.of(context).textTheme.subtitle2!.copyWith(
+        bodyTextStyle: Theme.of(context).textTheme.titleSmall!.copyWith(
             color: Colors.green.shade300, fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
             fontFamily: 'Comic Sans',

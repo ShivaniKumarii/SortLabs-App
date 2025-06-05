@@ -52,7 +52,7 @@ class _CustomArrayBottomSheetState extends State<CustomArrayBottomSheet> {
             children: [
               Text(
                 widget.sheetRequest.title!,
-                style: theme.textTheme.subtitle1?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.green, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 15),
@@ -66,11 +66,11 @@ class _CustomArrayBottomSheetState extends State<CustomArrayBottomSheet> {
                     maxLines: 1,
                     keyboardType: TextInputType.numberWithOptions(signed: true),
                     controller: _controller,
-                    style: theme.textTheme.subtitle2
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(color: lightGrayColor),
                     decoration: InputDecoration(
                       hintText: widget.sheetRequest.description,
-                      hintStyle: theme.textTheme.caption
+                      hintStyle: theme.textTheme.bodySmall
                           ?.copyWith(color: Color(0xff9B9B9B)),
                       focusedBorder: InputBorder.none,
                       border: InputBorder.none,

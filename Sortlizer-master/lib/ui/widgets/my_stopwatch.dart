@@ -27,7 +27,7 @@ class _MyStopWatchState extends State<MyStopWatch> {
       "${_stopwatch.elapsed.inMicroseconds}ms",
       style: Theme.of(context)
           .textTheme
-          .caption
+          .bodySmall
           ?.copyWith(color: lightGrayColor, letterSpacing: 0.5),
     );
   }
