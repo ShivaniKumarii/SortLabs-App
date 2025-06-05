@@ -23,24 +23,25 @@ jobs:
 
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: Sortizer-master
+        working-directory: Sortlizer-master
 
       - name: Run Flutter Analyze
         run: flutter analyze
-        working-directory: Sortizer-master
+        working-directory: Sortlizer-master
 
       - name: Run Flutter Tests
         run: flutter test
-        working-directory: Sortizer-master
+        working-directory: Sortlizer-master
 
       # --- Build Steps (We'll uncomment and add these in the next phase) ---
       # - name: Build Flutter Web
       #   run: flutter build web --release
-      #   working-directory: Sortizer-master
+      #   working-directory: Sortlizer-master
 
       # - name: Build Flutter Android (APK)
       #   run: flutter build apk --release
-      #   working-directory: Sortizer-master
+      #   working-directory: Sortlizer-master
+
 
       # --- Deployment Steps (These will come after successful builds) ---
       # - name: Deploy to GitHub Pages
